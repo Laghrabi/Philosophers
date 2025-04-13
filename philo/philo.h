@@ -27,6 +27,9 @@ typedef struct s_philo {
 
 
 /* FUNCTIONS */
+void	*philo_routine(void *arg);
+void	init_philosophers(pthread_mutex_t *fork, t_sim *sim, t_philo *philo);
+pthread_mutex_t	*init_fork(int num);
 ssize_t	ft_atoi(const char *str);
 int initialization(int ac, char **av, t_sim *sim);
 
