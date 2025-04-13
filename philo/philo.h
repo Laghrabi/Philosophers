@@ -17,6 +17,14 @@ typedef struct s_simulation {
 	int	times_must_eat;
 } t_sim;
 
+typedef struct s_philo {
+	int		id;
+	pthread_t		thread;
+	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	*left_fork;
+	t_sim			*sim;
+} t_philo;
+
 
 /* FUNCTIONS */
 ssize_t	ft_atoi(const char *str);
