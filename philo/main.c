@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:36:02 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/13 22:03:43 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:08:28 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int main(int ac, char **av)
     if (initialization(ac, av, &sim) == -1)
         return (1);
     forks = init_fork(sim.num_philos);
-	philo = malloc(sizeof(pthread_t) * sim.num_philos);
+	philo = malloc(sizeof(t_philo) * sim.num_philos);
 	init_philosophers(forks, &sim, philo);
 	i = 0;
 	while (i < sim.num_philos)
@@ -44,7 +44,7 @@ int main(int ac, char **av)
 	i = 0;
 	while (i < sim.num_philos)
 	{
-		pthread_join(&philo[i].thread, NULL);
+		pthread_join(philo[i].thread, NULL);
 		i++;
 	}
     return (0);   
