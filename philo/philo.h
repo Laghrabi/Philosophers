@@ -18,15 +18,18 @@ typedef struct s_simulation {
 } t_sim;
 
 typedef struct s_philo {
-	int		id;
+	int				id;
+	int				meals_eaten;
 	pthread_t		thread;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*left_fork;
 	t_sim			*sim;
+	long			last_meal_time;
 } t_philo;
 
 
 /* FUNCTIONS */
+void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks);
 void	*philo_routine(void *arg);
 void	init_philosophers(pthread_mutex_t *fork, t_sim *sim, t_philo *philo);
 pthread_mutex_t	*init_fork(int num);
