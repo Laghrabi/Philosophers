@@ -7,6 +7,7 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <limits.h>
+# include <sys/time.h>
 
 //STRUCTURES
 typedef struct s_simulation {
@@ -15,6 +16,10 @@ typedef struct s_simulation {
 	int	time_to_eat;
 	int	time_to_sleep;
 	int	times_must_eat;
+	long	start_time;
+	int	sim_end;
+	pthread_mutex_t	sim_mutex;
+	pthread_mutex_t	print_mutex;
 } t_sim;
 
 typedef struct s_philo {
@@ -23,12 +28,14 @@ typedef struct s_philo {
 	pthread_t		thread;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	meal_mutex;
 	t_sim			*sim;
 	long			last_meal_time;
 } t_philo;
 
 
 /* FUNCTIONS */
+int sim_has_ended(t_sim *sim);
 void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks);
 void	*philo_routine(void *arg);
 void	init_philosophers(pthread_mutex_t *fork, t_sim *sim, t_philo *philo);

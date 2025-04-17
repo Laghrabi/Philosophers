@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:34:44 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/13 15:49:03 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/16 13:23:21 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ ssize_t	ft_atoi(const char *str)
 
 int initialization(int ac, char **av, t_sim *sim)
 {
+	sim->sim_end = 0;
     sim->num_philos = ft_atoi(av[1]);
     sim->time_to_die = ft_atoi(av[2]);
     sim->time_to_eat = ft_atoi(av[3]);
