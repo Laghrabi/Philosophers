@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 21:03:41 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/15 16:09:48 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/18 17:46:50 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ void	init_philosophers(pthread_mutex_t *fork, t_sim *sim, t_philo *philo)
 	while (i < sim->num_philos)
 	{
 		philo[i].id = i + 1;
+		philo[i].is_done = 0;
 		philo[i].left_fork = &fork[i];
 		philo[i].right_fork = &fork[(i + 1) % sim->num_philos];
 		philo[i].sim = sim;
