@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:36:02 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/16 17:11:55 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:48:40 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	*philo_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2 != 0)
-    	usleep(500);
+    	usleep(philo->sim->time_to_eat * 1000);
 	while (sim_has_ended(philo->sim) != 1)
 	{
 		print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 't');
@@ -110,6 +110,7 @@ void	*philo_routine(void *arg)
 		pthread_mutex_unlock(philo->right_fork);
 		print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 's');
 		usleep(philo->sim->time_to_sleep * 1000);
+		usleep(500);
 	}
 	return (NULL);
 }
