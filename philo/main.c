@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:36:02 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/18 19:01:56 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/19 17:39:40 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,46 +22,24 @@ long	get_time(void)
 	return (ms);
 }
 
-void	print_action(t_sim *sim, long ms, int id, char c)
+void	print_action(t_sim *sim, int id, char c)
 {
 	pthread_mutex_lock(&sim->print_mutex);
 	if (!sim_has_ended(sim) || c == 'd')
 	{
 		if (c == 'f')
-			printf("%ld %d has taken a fork\n", ms, id);
+			printf("%ld %d has taken a fork\n", (get_time() - sim->start_time), id);
 		else if (c == 'e')
-			printf("%ld %d is eating\n", ms, id);
+			printf("%ld %d is eating\n", (get_time() - sim->start_time), id);
 		else if (c == 's')
-			printf("%ld %d is sleeping\n", ms, id);
+			printf("%ld %d is sleeping\n", (get_time() - sim->start_time), id);
 		else if (c == 't')
-			printf("%ld %d is thinking\n", ms, id);
+			printf("%ld %d is thinking\n", (get_time() - sim->start_time), id);
 		else
-			printf("%ld %d died\n", ms, id);
+			printf("%ld %d died\n", (get_time() - sim->start_time), id);
 	}
 	pthread_mutex_unlock(&sim->print_mutex);
 }
-
-// int	times_must_eat(t_philo *philo, int meals_eaten)
-// {
-// 	while (i < philo->sim->num_philos)
-// 	{
-// 		if (meals_eaten != philo->sim->times_must_eat)
-			
-// 	}
-// }
-
-// int	still_alive(t_philo *philo)
-// {
-// 	pthread_mutex_lock(&philo->meal_mutex);
-// 	if ((get_time() - philo->last_meal_time) > philo->sim->time_to_die)
-// 	{
-// 		print_action((get_time() - philo->sim->start_time), philo->id, 'd');
-// 		pthread_mutex_unlock(&philo->meal_mutex);
-// 		return (0);
-// 	}
-// 	pthread_mutex_unlock(&philo->meal_mutex);
-// 	return (1);
-// }
 
 int sim_has_ended(t_sim *sim)
 {
@@ -73,73 +51,138 @@ int sim_has_ended(t_sim *sim)
 	return (end);
 }
 
+void	*only_one(t_philo *philo)
+{
+	print_action(philo->sim, philo->id, 't');
+    pthread_mutex_lock(philo->left_fork);
+    print_action(philo->sim, philo->id, 'f');
+    usleep(philo->sim->time_to_die * 1000);
+    pthread_mutex_unlock(philo->left_fork);
+    return (NULL);
+}
+
+// int	can_eat_now(t_philo *philo)
+// {
+// 	int		(right), (left);
+
+// 	left = (philo->id - 2 + philo->sim->num_philos) % philo->sim->num_philos;
+// 	right = (philo->id) % philo->sim->num_philos;
+// 	pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+// 	pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+	
+// }
+
 void	*philo_routine(void *arg)
 {
 	t_philo *philo;
+	int		(i), (right), (left);
 
 	philo = (t_philo *)arg;
-	if (philo->id % 2 != 0)
-    	usleep(philo->sim->time_to_eat * 1000);
+	if (philo->sim->num_philos == 1)
+		return (only_one(philo));
+	i = 0;
 	while (sim_has_ended(philo->sim) != 1)
 	{
-		print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 't');
+		if(!i)
+			print_action(philo->sim, philo->id, 't');
+		i = 1;
+		left = (philo->id - 2 + philo->sim->num_philos) % philo->sim->num_philos;
+		right = (philo->id) % philo->sim->num_philos;
+		if (philo->id % 2 != 0 && philo->id == philo->sim->num_philos)
+		{
+			pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+			
+			if (philo->philo_array[left].meals_eaten != philo->meals_eaten || philo->philo_array[right].meals_eaten != philo->meals_eaten + 1)
+			{
+				pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+				pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+				usleep(500);
+				continue ;
+			}
+			pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+		}
+		else if (philo->id % 2 != 0)
+		{
+			pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+			if (philo->philo_array[left].meals_eaten != philo->meals_eaten || philo->philo_array[right].meals_eaten != philo->meals_eaten)
+			{
+				pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+				pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+				usleep(500);
+				continue ;
+			}
+			pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+		}
+		else if (philo->id % 2 == 0)
+		{
+			pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+			if (philo->philo_array[left].meals_eaten != philo->meals_eaten + 1 || philo->philo_array[right].meals_eaten != philo->meals_eaten + 1)
+			{
+				pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+				pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+				usleep(500);
+				continue ;
+			}
+			pthread_mutex_unlock(&philo->philo_array[left].meal_mutex);
+			pthread_mutex_unlock(&philo->philo_array[right].meal_mutex);
+		}
 		if (philo->id % 2 == 0)
 		{
 			pthread_mutex_lock(philo->left_fork);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'f');
+			print_action(philo->sim, philo->id, 'f');
 			pthread_mutex_lock(philo->right_fork);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'f');
+			print_action(philo->sim, philo->id, 'f');
 			pthread_mutex_lock(&philo->meal_mutex);
-			//printf("Philo_id= %d last_meal_time= %ld\n", philo->id, philo->last_meal_time);
 			philo->last_meal_time = get_time();
-			//printf("Philo_id= %d last_meal_time= %ld\n", philo->id, philo->last_meal_time);
 			pthread_mutex_unlock(&philo->meal_mutex);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'e');
+			print_action(philo->sim, philo->id, 'e');
 			usleep(philo->sim->time_to_eat * 1000);
-			if (philo->sim->times_must_eat != 0)
+			pthread_mutex_lock(&philo->meal_mutex);
+			philo->meals_eaten++;
+			if (philo->sim->times_must_eat != 0 && philo->meals_eaten == philo->sim->times_must_eat)
 			{
-				philo->meals_eaten++;
-				if (philo->meals_eaten == philo->sim->times_must_eat)
-				{
-					printf("id= %d meals_eaten= %d\n", philo->id, philo->meals_eaten);
-					philo->is_done = 1;
-					pthread_mutex_unlock(philo->left_fork);
-					pthread_mutex_unlock(philo->right_fork);
-					return (NULL);
-				}
+				philo->is_done = 1;
+				pthread_mutex_unlock(&philo->meal_mutex);
+				pthread_mutex_unlock(philo->left_fork);
+				pthread_mutex_unlock(philo->right_fork);
+				return (NULL);
 			}
+			pthread_mutex_unlock(&philo->meal_mutex);
 		}
 		else
 		{
 			pthread_mutex_lock(philo->right_fork);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'f');
+			print_action(philo->sim, philo->id, 'f');
 			pthread_mutex_lock(philo->left_fork);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'f');
+			print_action(philo->sim, philo->id, 'f');
 			pthread_mutex_lock(&philo->meal_mutex);
-			//printf("Philo_id= %d last_meal_time= %ld\n", philo->id, philo->last_meal_time);
 			philo->last_meal_time = get_time();
-			//printf("Philo_id= %d last_meal_time= %ld\n", philo->id, philo->last_meal_time);
 			pthread_mutex_unlock(&philo->meal_mutex);
-			print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 'e');
+			print_action(philo->sim, philo->id, 'e');
 			usleep(philo->sim->time_to_eat * 1000);
-			if (philo->sim->times_must_eat != 0)
+			pthread_mutex_lock(&philo->meal_mutex);
+			philo->meals_eaten++;
+			if (philo->sim->times_must_eat != 0 && philo->meals_eaten == philo->sim->times_must_eat)
 			{
-				philo->meals_eaten++;
-				if (philo->meals_eaten == philo->sim->times_must_eat)
-				{
-					printf("id= %d meals_eaten= %d\n", philo->id, philo->meals_eaten);
-					philo->is_done = 1;
-					pthread_mutex_unlock(philo->left_fork);
-					pthread_mutex_unlock(philo->right_fork);
-					return (NULL);
-				}
+				philo->is_done = 1;
+				pthread_mutex_unlock(&philo->meal_mutex);
+				pthread_mutex_unlock(philo->left_fork);
+				pthread_mutex_unlock(philo->right_fork);
+				return (NULL);
 			}
+			pthread_mutex_unlock(&philo->meal_mutex);
 		}
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
-		print_action(philo->sim, (get_time() - philo->sim->start_time), philo->id, 's');
+		print_action(philo->sim, philo->id, 's');
 		usleep(philo->sim->time_to_sleep * 1000);
 		usleep(500);
+		i = 0;
 	}
 	return (NULL);
 }
@@ -149,8 +192,7 @@ void	*monitor_routine(void *arg)
 	t_philo	*philo;
 	t_sim	*sim;
 	long	current_time;
-	int		i;
-	int all_done;
+	int (i), (all_done);
 
 	philo = (t_philo *)arg;
 	sim = philo[0].sim;
@@ -165,13 +207,12 @@ void	*monitor_routine(void *arg)
 			current_time = get_time();
 			if ((current_time - philo[i].last_meal_time) > philo[i].sim->time_to_die && philo[i].is_done == 0)
 			{
-				//printf("Philo= %d current_time= %ld last_meal_time= %ld time_to_die= %d, diff= %ld\n", philo[i].id, current_time, philo[i].last_meal_time, philo[i].sim->time_to_die, current_time - philo[i].last_meal_time);
 				pthread_mutex_lock(&sim->sim_mutex);
 				if (!sim->sim_end)
 				{
 				sim->sim_end = 1;
 				pthread_mutex_unlock(&sim->sim_mutex);
-				print_action(philo->sim, get_time() - sim->start_time, philo[i].id, 'd');
+				print_action(philo->sim, philo[i].id, 'd');
 				pthread_mutex_unlock(&philo[i].meal_mutex);
 				return (NULL);
 				}
@@ -186,10 +227,7 @@ void	*monitor_routine(void *arg)
         {
             pthread_mutex_lock(&sim->sim_mutex);
             if (!sim->sim_end)
-            {
                 sim->sim_end = 1;
-                printf("All philosophers have eaten %d times. Simulation complete.\n", sim->times_must_eat);
-            }
             pthread_mutex_unlock(&sim->sim_mutex);
             return (NULL);
         }

@@ -10,6 +10,8 @@
 # include <sys/time.h>
 
 //STRUCTURES
+typedef struct s_philo t_philo;
+
 typedef struct s_simulation {
     int	num_philos;
     int	time_to_die;
@@ -32,6 +34,7 @@ typedef struct s_philo {
 	pthread_mutex_t	meal_mutex;
 	t_sim			*sim;
 	long			last_meal_time;
+	t_philo *philo_array;
 } t_philo;
 
 
