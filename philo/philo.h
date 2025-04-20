@@ -40,6 +40,22 @@ typedef struct s_philo {
 
 /* FUNCTIONS */
 int sim_has_ended(t_sim *sim);
+long	get_time(void);
+void	print_action(t_sim *sim, int id, char c);
+int	if_even(t_philo *philo);
+int	if_odd(t_philo *philo);
+int	perform_eating(t_philo *philo);
+int	check_neighbors(t_philo *philo, int right, int left);
+pthread_mutex_t	*init_fork(int num);
+void	*only_one(t_philo *philo);
+void philo_sleep(t_philo *philo);
+void	lock_neighbors(t_philo *philo, int left, int right);
+void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks);
+void	*monitor_routine(void *arg);
+int	handle_all_done(t_sim *sim);
+int	check_if_all_done(t_philo *philo, t_sim *sim);
+int	check_philo_death(t_philo *philo);
+int sim_has_ended(t_sim *sim);
 void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks);
 void	*philo_routine(void *arg);
 void	init_philosophers(pthread_mutex_t *fork, t_sim *sim, t_philo *philo);
