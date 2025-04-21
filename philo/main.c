@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:36:02 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/20 16:59:27 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:07:25 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,26 @@ void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks)
 	pthread_join(monitor_thread, NULL);
 }
 
+void	clean_up(pthread_mutex_t *forks, t_philo *philo, t_sim *sim)
+{
+	int i;
+
+	i = 0;
+	while (i < sim->num_philos)
+	{
+		pthread_mutex_destroy(&forks[i]);
+		pthread_mutex_destroy(&philo[i].meal_mutex);
+		i++;
+	}
+	pthread_mutex_destroy(&sim->sim_mutex);
+	pthread_mutex_destroy(&sim->print_mutex);
+	free(forks);
+	free(philo);
+}
+
 int main(int ac, char **av)
 {
+	int i;
 	t_sim			sim;
 	t_philo			*philo;
 	pthread_mutex_t	*forks;
@@ -99,7 +117,11 @@ int main(int ac, char **av)
 		return (1);
 	philo = malloc(sizeof(t_philo) * sim.num_philos);
 	if (philo == NULL)
+	{
+		free(forks);
 		return (1);
+	}
 	start_simulation(&sim, philo, forks);
+	clean_up(forks, philo, &sim);
     return (0);   
 }

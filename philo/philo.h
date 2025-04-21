@@ -39,6 +39,7 @@ typedef struct s_philo {
 
 
 /* FUNCTIONS */
+void	clean_up(pthread_mutex_t *forks, t_philo *philo, t_sim *sim);
 int sim_has_ended(t_sim *sim);
 long	get_time(void);
 void	print_action(t_sim *sim, int id, char c);
