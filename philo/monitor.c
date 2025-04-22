@@ -6,11 +6,22 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 13:07:25 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/22 12:44:54 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/22 14:23:02 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+/**
+ * @brief Checks if a philosopher has died.
+ *
+ * Locks the philosopher's meal mutex to safely check if the time
+ * since their last meal exceeds the allowed time_to_die. If so,
+ * sets the simulation end flag and prints the death event.
+ *
+ * @param philo Pointer to the philosopher structure.
+ * @return 0 if the philosopher died, 1 otherwise.
+ */
 
 int	check_philo_death(t_philo *philo)
 {
@@ -33,6 +44,17 @@ int	check_philo_death(t_philo *philo)
 	return (1);
 }
 
+/**
+ * @brief Checks if all philosophers have finished eating or if any philosopher died.
+ *
+ * Iterates through all philosophers, checking for deaths using check_philo_death().
+ * Also checks if each philosopher has finished the required number of meals.
+ *
+ * @param philo Pointer to the array of philosopher structures.
+ * @param sim Pointer to the simulation structure.
+ * @return 1 if all philosophers are done, 0 if simulation should continue.
+ */
+
 int	check_if_all_done(t_philo *philo, t_sim *sim)
 {
 	int (i), (all_done);
@@ -51,6 +73,15 @@ int	check_if_all_done(t_philo *philo, t_sim *sim)
 	return (all_done);
 }
 
+/**
+ * @brief Safely marks the simulation as ended when all philosophers are done.
+ *
+ * Locks the simulation mutex and sets the sim_end flag to 1 if it is not already set.
+ *
+ * @param sim Pointer to the simulation structure.
+ * @return Always returns 0 (success).
+ */
+
 int	handle_all_done(t_sim *sim)
 {
 	pthread_mutex_lock(&sim->sim_mutex);
@@ -59,6 +90,17 @@ int	handle_all_done(t_sim *sim)
 	pthread_mutex_unlock(&sim->sim_mutex);
 	return (0);
 }
+
+/**
+ * @brief Monitoring routine that constantly checks philosophers' statuses.
+ *
+ * A thread running this function will periodically check if any philosopher has died
+ * or if all philosophers have completed the required number of meals. 
+ * If a philosopher dies or all are done, the simulation ends.
+ *
+ * @param arg Pointer to the first philosopher structure (used to get sim pointer too).
+ * @return NULL when the monitoring thread terminates.
+ */
 
 void	*monitor_routine(void *arg)
 {

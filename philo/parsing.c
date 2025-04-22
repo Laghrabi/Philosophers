@@ -6,11 +6,22 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:34:44 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/22 12:46:22 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/22 14:18:46 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+/**
+ * @brief Converts a string to a signed size_t integer.
+ * 
+ * The function skips leading whitespace characters, handles an optional '+' or '-' sign,
+ * and then converts the following digit characters into an integer value.
+ * If the string contains invalid characters or the number overflows, it returns -1.
+ *
+ * @param str The string to convert.
+ * @return The converted integer value on success, or -1 on error (invalid input or overflow).
+ */
 
 ssize_t	ft_atoi(const char *str)
 {
@@ -40,6 +51,18 @@ ssize_t	ft_atoi(const char *str)
 	}
 	return (result * sign);
 }
+
+/**
+ * @brief Initializes the simulation parameters from command-line arguments.
+ * 
+ * Parses and validates the arguments to fill the t_sim structure with the number of philosophers,
+ * time to die, time to eat, time to sleep, and optional number of times each philosopher must eat.
+ * 
+ * @param ac The argument count.
+ * @param av The argument vector (array of strings).
+ * @param sim Pointer to the simulation structure to initialize.
+ * @return 0 on success, -1 if an error occurs (invalid or negative argument values).
+ */
 
 int	initialization(int ac, char **av, t_sim *sim)
 {
