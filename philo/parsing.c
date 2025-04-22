@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:34:44 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/16 13:23:21 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:46:22 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,8 @@
 
 ssize_t	ft_atoi(const char *str)
 {
-	int		(i), (sign);
-	ssize_t	result;
-
+	int (i), (sign);
+	ssize_t (result);
 	i = 0;
 	sign = 1;
 	result = 0;
@@ -35,29 +34,29 @@ ssize_t	ft_atoi(const char *str)
 			return (-1);
 		i++;
 	}
-    if (str[i] != '\0')
-    {
-        return (-1);
-    }
+	if (str[i] != '\0')
+	{
+		return (-1);
+	}
 	return (result * sign);
 }
 
-int initialization(int ac, char **av, t_sim *sim)
+int	initialization(int ac, char **av, t_sim *sim)
 {
 	sim->sim_end = 0;
-    sim->num_philos = ft_atoi(av[1]);
-    sim->time_to_die = ft_atoi(av[2]);
-    sim->time_to_eat = ft_atoi(av[3]);
-    sim->time_to_sleep = ft_atoi(av[4]);
-    if (ac == 6)
-        sim->times_must_eat = ft_atoi(av[5]);
-    else
-        sim->times_must_eat = 0;
-    if (sim->num_philos < 0 || sim->time_to_die < 0 || sim->time_to_eat < 0
-        || sim->time_to_sleep < 0 || sim->times_must_eat < 0)
-    {
-        printf("Wrong Arguments\n");
-        return (-1);
-    }
-    return (0);
+	sim->num_philos = ft_atoi(av[1]);
+	sim->time_to_die = ft_atoi(av[2]);
+	sim->time_to_eat = ft_atoi(av[3]);
+	sim->time_to_sleep = ft_atoi(av[4]);
+	if (ac == 6)
+		sim->times_must_eat = ft_atoi(av[5]);
+	else
+		sim->times_must_eat = 0;
+	if (sim->num_philos < 0 || sim->time_to_die < 0 || sim->time_to_eat < 0
+		|| sim->time_to_sleep < 0 || sim->times_must_eat < 0)
+	{
+		printf("Wrong Arguments\n");
+		return (-1);
+	}
+	return (0);
 }

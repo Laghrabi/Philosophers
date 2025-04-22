@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 21:03:41 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/19 11:19:18 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:25:39 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 pthread_mutex_t	*init_fork(int num)
 {
 	int				i;
-    pthread_mutex_t	*forks;
+	pthread_mutex_t	*forks;
 
 	forks = malloc(sizeof(pthread_mutex_t) * num);
 	if (forks == NULL)

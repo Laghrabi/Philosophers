@@ -6,7 +6,7 @@
 /*   By: claghrab <claghrab@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 14:36:02 by claghrab          #+#    #+#             */
-/*   Updated: 2025/04/21 15:07:25 by claghrab         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:19:17 by claghrab         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,25 @@
 void	*only_one(t_philo *philo)
 {
 	print_action(philo->sim, philo->id, 't');
-    pthread_mutex_lock(philo->left_fork);
-    print_action(philo->sim, philo->id, 'f');
-    usleep(philo->sim->time_to_die * 1000);
-    pthread_mutex_unlock(philo->left_fork);
-    return (NULL);
-}
-
-void philo_sleep(t_philo *philo)
-{
-	print_action(philo->sim, philo->id, 's');
-	usleep(philo->sim->time_to_sleep * 1000);
-	usleep(500);
+	pthread_mutex_lock(philo->left_fork);
+	print_action(philo->sim, philo->id, 'f');
+	usleep(philo->sim->time_to_die * 1000);
+	pthread_mutex_unlock(philo->left_fork);
+	return (NULL);
 }
 
 void	lock_neighbors(t_philo *philo, int left, int right)
 {
-	if (&philo->philo_array[left].meal_mutex < &philo->philo_array[right].meal_mutex)
+	if (&philo->philo_array[left].meal_mutex \
+		< &philo->philo_array[right].meal_mutex)
 	{
-	pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
-	pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+		pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+		pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
 	}
 	else
 	{
-	pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
-	pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
+		pthread_mutex_lock(&philo->philo_array[right].meal_mutex);
+		pthread_mutex_lock(&philo->philo_array[left].meal_mutex);
 	}
 }
 
@@ -62,7 +56,7 @@ void	init_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks)
 
 void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks)
 {
-	int	i;
+	int			i;
 	pthread_t	monitor_thread;
 
 	init_simulation(sim, philo, forks);
@@ -82,35 +76,17 @@ void	start_simulation(t_sim *sim, t_philo *philo, pthread_mutex_t *forks)
 	pthread_join(monitor_thread, NULL);
 }
 
-void	clean_up(pthread_mutex_t *forks, t_philo *philo, t_sim *sim)
+int	main(int ac, char **av)
 {
-	int i;
-
-	i = 0;
-	while (i < sim->num_philos)
-	{
-		pthread_mutex_destroy(&forks[i]);
-		pthread_mutex_destroy(&philo[i].meal_mutex);
-		i++;
-	}
-	pthread_mutex_destroy(&sim->sim_mutex);
-	pthread_mutex_destroy(&sim->print_mutex);
-	free(forks);
-	free(philo);
-}
-
-int main(int ac, char **av)
-{
-	int i;
 	t_sim			sim;
 	t_philo			*philo;
 	pthread_mutex_t	*forks;
-	
-    if (ac < 5 || ac > 6)
-        return (0);
-    if (initialization(ac, av, &sim) == -1)
-	{	
-        return (1);
+
+	if (ac < 5 || ac > 6)
+		return (0);
+	if (initialization(ac, av, &sim) == -1)
+	{
+		return (1);
 	}
 	forks = init_fork(sim.num_philos);
 	if (forks == NULL)
@@ -123,5 +99,5 @@ int main(int ac, char **av)
 	}
 	start_simulation(&sim, philo, forks);
 	clean_up(forks, philo, &sim);
-    return (0);   
+	return (0);
 }
